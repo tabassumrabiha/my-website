@@ -189,25 +189,28 @@
   <style>
     body {
       font-family: 'Arial', sans-serif;
-      background: #f3ebff;
+      background: #2c1a4a; /* dark lavender */
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
       margin: 0;
+      color: #fff;
     }
     .timer-container {
       text-align: center;
-      background: #e6ddff;
+      background: #3b2b66; /* darker lavender box */
       padding: 50px 70px;
       border-radius: 25px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      color: #6b4fff;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      color: #f0e6ff;
     }
     #timer {
       font-size: 4rem;
       margin: 20px 0;
       font-weight: bold;
+      color: #e0b3ff; /* neon lavender timer */
+      text-shadow: 0 0 15px #e0b3ff;
     }
     #timer span {
       display: inline-block;
@@ -216,36 +219,39 @@
       transition: all 0.3s ease-in-out;
     }
     @keyframes tick {
-      0% { transform: scale(1); color: #6b4fff; text-shadow: 0 0 0 #6b4fff; }
-      50% { transform: scale(1.2); color: #9b77ff; text-shadow: 0 0 10px #9b77ff; }
-      100% { transform: scale(1); color: #6b4fff; text-shadow: 0 0 0 #6b4fff; }
+      0% { transform: scale(1); color: #e0b3ff; text-shadow: 0 0 10px #e0b3ff; }
+      50% { transform: scale(1.2); color: #ff9dff; text-shadow: 0 0 20px #ff9dff; }
+      100% { transform: scale(1); color: #e0b3ff; text-shadow: 0 0 10px #e0b3ff; }
     }
     input {
       width: 80px;
       padding: 5px;
       border-radius: 5px;
-      border: 1px solid #6b4fff;
+      border: 1px solid #9d7fff;
       text-align: center;
       font-size: 1rem;
       margin-right: 10px;
+      background: #2c1a4a;
+      color: #fff;
     }
     button {
       padding: 8px 15px;
       border: none;
       border-radius: 5px;
-      background: #6b4fff;
-      color: white;
+      background: #9d7fff;
+      color: #2c1a4a;
       font-size: 1rem;
       cursor: pointer;
       margin: 0 5px;
+      font-weight: bold;
     }
     button:hover {
-      background: #9b77ff;
+      background: #c5a3ff;
     }
     #mode {
       font-size: 1.2rem;
       margin-top: 10px;
-      color: #5a3fff;
+      color: #d9b3ff;
     }
   </style>
 </head>
