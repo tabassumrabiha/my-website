@@ -185,7 +185,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Study Timer</title>
+  <title>Pomodoro Study Timer</title>
   <style>
     body {
       font-family: 'Arial', sans-serif;
@@ -242,18 +242,25 @@
     button:hover {
       background: #9b77ff;
     }
+    #mode {
+      font-size: 1.2rem;
+      margin-top: 10px;
+      color: #5a3fff;
+    }
   </style>
 </head>
 <body>
 
 <div class="timer-container">
-  <h2>Study Timer 📚</h2>
+  <h2>Pomodoro Study Timer 📚</h2>
   <div>
-    <input type="number" id="minutes" placeholder="Minutes">
+    <input type="number" id="minutes" placeholder="Study min">
+    <input type="number" id="break" placeholder="Break min">
     <button id="start">Start</button>
     <button id="pause">Pause</button>
     <button id="reset">Reset</button>
   </div>
+  <div id="mode">Mode: Study</div>
   <div id="timer">
     <span>00</span>:<span>00</span>
   </div>
@@ -261,14 +268,17 @@
 
 <script>
   let timerInterval;
-  let timeLeft = 0; // in seconds
+  let timeLeft = 0;
   let running = false;
+  let isStudy = true;
 
   const timerElement = document.getElementById('timer');
+  const modeElement = document.getElementById('mode');
   const startBtn = document.getElementById('start');
   const pauseBtn = document.getElementById('pause');
   const resetBtn = document.getElementById('reset');
   const minutesInput = document.getElementById('minutes');
+  const breakInput = document.getElementById('break');
 
   function updateTimerDisplay() {
     const mins = Math.floor(timeLeft / 60);
@@ -283,20 +293,45 @@
     } else {
       clearInterval(timerInterval);
       running = false;
-      alert("⏰ Time's up! Take a short break or keep studying!");
+      if (isStudy) {
+        alert("✅ Study session done! Time for a break!");
+        startBreak();
+      } else {
+        alert("☕ Break over! Back to studying!");
+        startStudy();
+      }
+    }
+  }
+
+  function startStudy() {
+    const mins = parseInt(minutesInput.value);
+    if (isNaN(mins) || mins <= 0) return alert("Enter a valid study time!");
+    timeLeft = mins * 60;
+    isStudy = true;
+    modeElement.textContent = "Mode: Study";
+    startTimer();
+  }
+
+  function startBreak() {
+    const mins = parseInt(breakInput.value);
+    if (isNaN(mins) || mins <= 0) return alert("Enter a valid break time!");
+    timeLeft = mins * 60;
+    isStudy = false;
+    modeElement.textContent = "Mode: Break";
+    startTimer();
+  }
+
+  function startTimer() {
+    if (!running) {
+      timerInterval = setInterval(tick, 1000);
+      running = true;
+      updateTimerDisplay();
     }
   }
 
   startBtn.addEventListener('click', () => {
-    if (!running) {
-      if (timeLeft === 0) {
-        const mins = parseInt(minutesInput.value);
-        if (isNaN(mins) || mins <= 0) return alert("Enter a valid number of minutes!");
-        timeLeft = mins * 60;
-      }
-      timerInterval = setInterval(tick, 1000);
-      running = true;
-    }
+    if (timeLeft === 0) startStudy();
+    else startTimer();
   });
 
   pauseBtn.addEventListener('click', () => {
@@ -310,6 +345,8 @@
     clearInterval(timerInterval);
     running = false;
     timeLeft = 0;
+    isStudy = true;
+    modeElement.textContent = "Mode: Study";
     updateTimerDisplay();
   });
 
