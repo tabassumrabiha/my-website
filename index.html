@@ -185,19 +185,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Inspirational Website</title>
+  <title>Study Timer</title>
   <style>
-    /* --- Body & Container --- */
     body {
       font-family: 'Arial', sans-serif;
-      background: #f3ebff; /* soft lavender */
+      background: #f3ebff;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
       margin: 0;
     }
-
     .timer-container {
       text-align: center;
       background: #e6ddff;
@@ -206,79 +204,117 @@
       box-shadow: 0 10px 25px rgba(0,0,0,0.1);
       color: #6b4fff;
     }
-
-    /* --- Timer Text --- */
     #timer {
-      font-size: 3rem;
-      margin-top: 20px;
-      letter-spacing: 2px;
+      font-size: 4rem;
+      margin: 20px 0;
       font-weight: bold;
     }
-
-    #timer .time {
+    #timer span {
       display: inline-block;
       padding: 0 5px;
       animation: tick 0.5s ease-in-out;
       transition: all 0.3s ease-in-out;
     }
-
-    .timer-container h2 {
-      font-size: 1.5rem;
-      margin-bottom: 10px;
-      color: #5a3fff;
-    }
-
-    /* --- Glow & Tick Animation --- */
     @keyframes tick {
       0% { transform: scale(1); color: #6b4fff; text-shadow: 0 0 0 #6b4fff; }
       50% { transform: scale(1.2); color: #9b77ff; text-shadow: 0 0 10px #9b77ff; }
       100% { transform: scale(1); color: #6b4fff; text-shadow: 0 0 0 #6b4fff; }
     }
+    input {
+      width: 80px;
+      padding: 5px;
+      border-radius: 5px;
+      border: 1px solid #6b4fff;
+      text-align: center;
+      font-size: 1rem;
+      margin-right: 10px;
+    }
+    button {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      background: #6b4fff;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      margin: 0 5px;
+    }
+    button:hover {
+      background: #9b77ff;
+    }
   </style>
 </head>
 <body>
 
-  <div class="timer-container">
-    <h2>Countdown to Inspiration ✨</h2>
-    <div id="timer">
-      <span class="time">00</span>d 
-      <span class="time">00</span>h 
-      <span class="time">00</span>m 
-      <span class="time">00</span>s
-    </div>
+<div class="timer-container">
+  <h2>Study Timer 📚</h2>
+  <div>
+    <input type="number" id="minutes" placeholder="Minutes">
+    <button id="start">Start</button>
+    <button id="pause">Pause</button>
+    <button id="reset">Reset</button>
   </div>
+  <div id="timer">
+    <span>00</span>:<span>00</span>
+  </div>
+</div>
 
-  <script>
-    const countdownDate = new Date("Jan 20, 2026 00:00:00").getTime();
-    const timerElement = document.getElementById("timer");
+<script>
+  let timerInterval;
+  let timeLeft = 0; // in seconds
+  let running = false;
 
-    function updateTimer() {
-      const now = new Date().getTime();
-      const distance = countdownDate - now;
+  const timerElement = document.getElementById('timer');
+  const startBtn = document.getElementById('start');
+  const pauseBtn = document.getElementById('pause');
+  const resetBtn = document.getElementById('reset');
+  const minutesInput = document.getElementById('minutes');
 
-      if (distance < 0) {
-        clearInterval(timerInterval);
-        timerElement.innerHTML = "✨ IT'S TIME! ✨";
-        return;
-      }
+  function updateTimerDisplay() {
+    const mins = Math.floor(timeLeft / 60);
+    const secs = timeLeft % 60;
+    timerElement.innerHTML = `<span>${mins.toString().padStart(2,'0')}</span>:<span>${secs.toString().padStart(2,'0')}</span>`;
+  }
 
-      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-      timerElement.innerHTML = `
-        <span class="time">${days.toString().padStart(2,'0')}</span>d 
-        <span class="time">${hours.toString().padStart(2,'0')}</span>h 
-        <span class="time">${minutes.toString().padStart(2,'0')}</span>m 
-        <span class="time">${seconds.toString().padStart(2,'0')}</span>s
-      `;
+  function tick() {
+    if (timeLeft > 0) {
+      timeLeft--;
+      updateTimerDisplay();
+    } else {
+      clearInterval(timerInterval);
+      running = false;
+      alert("⏰ Time's up! Take a short break or keep studying!");
     }
+  }
 
-    const timerInterval = setInterval(updateTimer, 1000);
-    updateTimer();
-  </script>
+  startBtn.addEventListener('click', () => {
+    if (!running) {
+      if (timeLeft === 0) {
+        const mins = parseInt(minutesInput.value);
+        if (isNaN(mins) || mins <= 0) return alert("Enter a valid number of minutes!");
+        timeLeft = mins * 60;
+      }
+      timerInterval = setInterval(tick, 1000);
+      running = true;
+    }
+  });
+
+  pauseBtn.addEventListener('click', () => {
+    if (running) {
+      clearInterval(timerInterval);
+      running = false;
+    }
+  });
+
+  resetBtn.addEventListener('click', () => {
+    clearInterval(timerInterval);
+    running = false;
+    timeLeft = 0;
+    updateTimerDisplay();
+  });
+
+  updateTimerDisplay();
+</script>
 
 </body>
 </html>
-
