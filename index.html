@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dream. Build. Become.</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, #ede9fe 0%, transparent 40%),
+                  radial-gradient(800px 400px at 90% 10%, #fdf2f8 0%, transparent 35%),
+                  linear-gradient(135deg, #0f172a, #020617);
+      color: #e5e7eb;
+      min-height: 100vh;
+    }
+    header {
+      padding: 5rem 1.5rem 3rem;
+      text-align: center;
+      max-width: 900px;
+      margin: auto;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.35rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(139,92,246,0.15);
+      color: #c4b5fd;
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
+      margin-bottom: 1rem;
+    }
+    header h1 {
+      font-size: clamp(2.4rem, 5vw, 3.5rem);
+      line-height: 1.1;
+      margin: 1rem 0;
+    }
+    header h1 span { color: #a78bfa; }
+    header p {
+      opacity: 0.85;
+      max-width: 700px;
+      margin: 0.8rem auto 2rem;
+      font-size: 1.05rem;
+    }
+    .cta {
+      display: inline-flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn {
+      padding: 0.75rem 1.6rem;
+      border-radius: 999px;
+      border: none;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+      color: white;
+      box-shadow: 0 10px 30px rgba(139,92,246,0.35);
+    }
+    .btn-primary:hover { transform: translateY(-2px); }
+    .btn-ghost {
+      background: rgba(255,255,255,0.06);
+      color: #e5e7eb;
+      backdrop-filter: blur(6px);
+    }
+    main {
+      max-width: 1100px;
+      margin: auto;
+      padding: 3rem 1.5rem 4rem;
+      display: grid;
+      gap: 2rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+    .card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 1.2rem;
+      padding: 1.6rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+      backdrop-filter: blur(10px);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.45);
+    }
+    .card h3 { margin-top: 0; color: #ddd6fe; }
+    .quote {
+      text-align: center;
+      font-size: 1.3rem;
+      line-height: 1.6;
+      padding: 2.5rem 1.5rem;
+      color: #f5f3ff;
+    }
+    .quote span { color: #a78bfa; }
+    footer {
+      text-align: center;
+      padding: 2rem 1rem 3rem;
+      font-size: 0.85rem;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="badge">INSPIRE MODE</div>
+    <h1>Dream boldly.<br>Build daily.<br><span>Become unstoppable.</span></h1>
+    <p>You don’t need permission to start. Small steps, taken consistently, literally change everything. This page exists to remind you of that.</p>
+    <div class="cta">
+      <button class="btn btn-primary" onclick="motivate()">Get inspired</button>
+      <button class="btn btn-ghost" onclick="scrollToSection()">Keep scrolling</button>
+    </div>
+  </header>
+
+  <main id="content">
+    <section class="grid">
+      <div class="card">
+        <h3>Start before you’re ready</h3>
+        <p>No one ever feels fully prepared. Progress begins the moment you choose action over comfort.</p>
+      </div>
+      <div class="card">
+        <h3>Consistency > motivation</h3>
+        <p>Motivation fades. Habits don’t. Show up even when it’s boring — that’s where growth lives.</p>
+      </div>
+      <div class="card">
+        <h3>Failure isn’t the end</h3>
+        <p>It’s feedback. Adjust, learn, and come back stronger. That’s the whole game.</p>
+      </div>
+    </section>
+
+    <section class="quote">
+      “The version of you you’re becoming is already proud of you for not quitting.” <br><span>— keep going</span>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h3>Protect your focus</h3>
+        <p>Your attention is your power. Spend it on things that move your life forward.</p>
+      </div>
+      <div class="card">
+        <h3>Growth is uncomfortable</h3>
+        <p>If it feels hard, that means it’s working. Comfort never changed a life.</p>
+      </div>
+      <div class="card">
+        <h3>Believe, then build</h3>
+        <p>Confidence comes after action, not before. Start messy. Improve publicly.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Built with purpose ✨ · Dream. Build. Become.
+  </footer>
+
+  <script>
+    const lines = [
+      "You are capable of more than you think.",
+      "Discipline today = freedom tomorrow.",
+      "Slow progress is still progress.",
+      "Your future self is watching.",
+      "This is your sign to keep going."
+    ];
+    function motivate() {
+      const pick = lines[Math.floor(Math.random() * lines.length)];
+      alert(pick);
+    }
+    function scrollToSection() {
+      document.getElementById('content').scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
