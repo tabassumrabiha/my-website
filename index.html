@@ -179,3 +179,106 @@
   </script>
 </body>
 </html>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Inspirational Website</title>
+  <style>
+    /* --- Body & Container --- */
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #f3ebff; /* soft lavender */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .timer-container {
+      text-align: center;
+      background: #e6ddff;
+      padding: 50px 70px;
+      border-radius: 25px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      color: #6b4fff;
+    }
+
+    /* --- Timer Text --- */
+    #timer {
+      font-size: 3rem;
+      margin-top: 20px;
+      letter-spacing: 2px;
+      font-weight: bold;
+    }
+
+    #timer .time {
+      display: inline-block;
+      padding: 0 5px;
+      animation: tick 0.5s ease-in-out;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .timer-container h2 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      color: #5a3fff;
+    }
+
+    /* --- Glow & Tick Animation --- */
+    @keyframes tick {
+      0% { transform: scale(1); color: #6b4fff; text-shadow: 0 0 0 #6b4fff; }
+      50% { transform: scale(1.2); color: #9b77ff; text-shadow: 0 0 10px #9b77ff; }
+      100% { transform: scale(1); color: #6b4fff; text-shadow: 0 0 0 #6b4fff; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="timer-container">
+    <h2>Countdown to Inspiration ✨</h2>
+    <div id="timer">
+      <span class="time">00</span>d 
+      <span class="time">00</span>h 
+      <span class="time">00</span>m 
+      <span class="time">00</span>s
+    </div>
+  </div>
+
+  <script>
+    const countdownDate = new Date("Jan 20, 2026 00:00:00").getTime();
+    const timerElement = document.getElementById("timer");
+
+    function updateTimer() {
+      const now = new Date().getTime();
+      const distance = countdownDate - now;
+
+      if (distance < 0) {
+        clearInterval(timerInterval);
+        timerElement.innerHTML = "✨ IT'S TIME! ✨";
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      timerElement.innerHTML = `
+        <span class="time">${days.toString().padStart(2,'0')}</span>d 
+        <span class="time">${hours.toString().padStart(2,'0')}</span>h 
+        <span class="time">${minutes.toString().padStart(2,'0')}</span>m 
+        <span class="time">${seconds.toString().padStart(2,'0')}</span>s
+      `;
+    }
+
+    const timerInterval = setInterval(updateTimer, 1000);
+    updateTimer();
+  </script>
+
+</body>
+</html>
+
