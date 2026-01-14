@@ -442,6 +442,28 @@ button{
   cursor:pointer;
 }
 
+/* Player animation */
+#player{
+  width:40px;
+  height:70px;
+  background:#16a34a;
+  border-radius:6px;
+  margin-bottom:15px;
+  position:relative;
+  transition:0.4s;
+}
+
+#player::before{
+  content:"";
+  width:30px;
+  height:30px;
+  background:#fde68a;
+  border-radius:50%;
+  position:absolute;
+  top:-35px;
+  left:5px;
+}
+
 @media(max-width:600px){
   .glass{width:70px;height:38px}
 }
@@ -451,13 +473,16 @@ button{
 <body>
 
 <h1>🟦 Glass Bridge Challenge</h1>
+
 <div id="hud">
   <div class="box" id="timer">⏱️ Time: 60</div>
   <div class="box">🏆 Best: <span id="best">--</span>s</div>
   <div class="box">📊 Last: <span id="last">--</span>s</div>
 </div>
 
+<!-- PLAYER -->
 <div id="player"></div>
+
 <div class="bridge" id="bridge"></div>
 <button onclick="resetBest()">Reset Best</button>
 
@@ -474,6 +499,7 @@ let finished = false;
 const bridge = document.getElementById("bridge");
 const bestEl = document.getElementById("best");
 const lastEl = document.getElementById("last");
+const player = document.getElementById("player");
 
 const bestTime = localStorage.getItem("bestTime");
 if(bestTime) bestEl.innerText = bestTime;
@@ -499,14 +525,20 @@ function build(){
 
 function choose(choice,glass,row){
   row.querySelectorAll(".glass").forEach(g=>g.classList.add("disabled"));
+  document.getElementById("clickSound").play();
+  
   if(choice===answers[current]){
     glass.classList.add("safe");
     current++;
+    player.style.transform = `translateY(${current * 55}px)`; // move player forward
+    
     if(current===steps){
       win();
     }else setTimeout(build,300);
   }else{
     glass.classList.add("broken");
+    player.style.transform += " rotate(90deg)";
+    player.style.opacity = "0";
     gameOver();
   }
 }
@@ -551,7 +583,3 @@ build();
 
 </body>
 </html>
-
-
-
-
