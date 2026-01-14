@@ -185,335 +185,120 @@
 
 
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Pomodoro Study Timer</title>
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      background: #2c1a4a; /* dark lavender */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      color: #fff;
-    }
-    .timer-container {
-      text-align: center;
-      background: #3b2b66; /* darker lavender box */
-      padding: 50px 70px;
-      border-radius: 25px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      color: #f0e6ff;
-    }
-    #timer {
-      font-size: 4rem;
-      margin: 20px 0;
-      font-weight: bold;
-      color: #e0b3ff; /* neon lavender timer */
-      text-shadow: 0 0 15px #e0b3ff;
-    }
-    #timer span {
-      display: inline-block;
-      padding: 0 5px;
-      animation: tick 0.5s ease-in-out;
-      transition: all 0.3s ease-in-out;
-    }
-    @keyframes tick {
-      0% { transform: scale(1); color: #e0b3ff; text-shadow: 0 0 10px #e0b3ff; }
-      50% { transform: scale(1.2); color: #ff9dff; text-shadow: 0 0 20px #ff9dff; }
-      100% { transform: scale(1); color: #e0b3ff; text-shadow: 0 0 10px #e0b3ff; }
-    }
-    input {
-      width: 80px;
-      padding: 5px;
-      border-radius: 5px;
-      border: 1px solid #9d7fff;
-      text-align: center;
-      font-size: 1rem;
-      margin-right: 10px;
-      background: #2c1a4a;
-      color: #fff;
-    }
-    button {
-      padding: 8px 15px;
-      border: none;
-      border-radius: 5px;
-      background: #9d7fff;
-      color: #2c1a4a;
-      font-size: 1rem;
-      cursor: pointer;
-      margin: 0 5px;
-      font-weight: bold;
-    }
-    button:hover {
-      background: #c5a3ff;
-    }
-    #mode {
-      font-size: 1.2rem;
-      margin-top: 10px;
-      color: #d9b3ff;
-    }
-  </style>
-</head>
-<body>
-
-<div class="timer-container">
-  <h2>Pomodoro Study Timer 📚</h2>
-  <div>
-    <input type="number" id="minutes" placeholder="Study min">
-    <input type="number" id="break" placeholder="Break min">
-    <button id="start">Start</button>
-    <button id="pause">Pause</button>
-    <button id="reset">Reset</button>
-  </div>
-  <div id="mode">Mode: Study</div>
-  <div id="timer">
-    <span>00</span>:<span>00</span>
-  </div>
-</div>
-
 <script>
-  let timerInterval;
-  let timeLeft = 0;
-  let running = false;
-  let isStudy = true;
+document.addEventListener("DOMContentLoaded", function() {
+  let steps = 18,
+      current = 0,
+      time = 60,
+      finished = false;
 
-  const timerElement = document.getElementById('timer');
-  const modeElement = document.getElementById('mode');
-  const startBtn = document.getElementById('start');
-  const pauseBtn = document.getElementById('pause');
-  const resetBtn = document.getElementById('reset');
-  const minutesInput = document.getElementById('minutes');
-  const breakInput = document.getElementById('break');
+  let bridge, bridgeContainer, player, bestEl, lastEl, timerInterval, bestTime = localStorage.getItem("bestTime");
+  let answers = [];
 
-  function updateTimerDisplay() {
-    const mins = Math.floor(timeLeft / 60);
-    const secs = timeLeft % 60;
-    timerElement.innerHTML = `<span>${mins.toString().padStart(2,'0')}</span>:<span>${secs.toString().padStart(2,'0')}</span>`;
+  // generate or load fixed pattern
+  if(localStorage.getItem("glassBridgePattern")){
+    answers = JSON.parse(localStorage.getItem("glassBridgePattern"));
+  } else {
+    answers = Array.from({length:steps}, ()=>Math.floor(Math.random()*2));
+    localStorage.setItem("glassBridgePattern", JSON.stringify(answers));
   }
 
-  function tick() {
-    if (timeLeft > 0) {
-      timeLeft--;
-      updateTimerDisplay();
-    } else {
-      clearInterval(timerInterval);
-      running = false;
-      if (isStudy) {
-        alert("✅ Study session done! Time for a break!");
-        startBreak();
-      } else {
-        alert("☕ Break over! Back to studying!");
-        startStudy();
-      }
-    }
-  }
+  document.getElementById("startBtn").addEventListener("click", function(){
+    document.getElementById("game-container").style.display = "block";
 
-  function startStudy() {
-    const mins = parseInt(minutesInput.value);
-    if (isNaN(mins) || mins <= 0) return alert("Enter a valid study time!");
-    timeLeft = mins * 60;
-    isStudy = true;
-    modeElement.textContent = "Mode: Study";
-    startTimer();
-  }
+    bridge = document.getElementById("bridge");
+    bridgeContainer = document.getElementById("bridgeContainer");
+    player = document.getElementById("player");
+    bestEl = document.getElementById("best");
+    lastEl = document.getElementById("last");
 
-  function startBreak() {
-    const mins = parseInt(breakInput.value);
-    if (isNaN(mins) || mins <= 0) return alert("Enter a valid break time!");
-    timeLeft = mins * 60;
-    isStudy = false;
-    modeElement.textContent = "Mode: Break";
-    startTimer();
-  }
+    if(bestTime) bestEl.innerText = bestTime;
 
-  function startTimer() {
-    if (!running) {
-      timerInterval = setInterval(tick, 1000);
-      running = true;
-      updateTimerDisplay();
-    }
-  }
+    current = 0;
+    finished = false;
+    time = 60;
 
-  startBtn.addEventListener('click', () => {
-    if (timeLeft === 0) startStudy();
-    else startTimer();
-  });
+    build();
 
-  pauseBtn.addEventListener('click', () => {
-    if (running) {
-      clearInterval(timerInterval);
-      running = false;
-    }
-  });
-
-  resetBtn.addEventListener('click', () => {
     clearInterval(timerInterval);
-    running = false;
-    timeLeft = 0;
-    isStudy = true;
-    modeElement.textContent = "Mode: Study";
-    updateTimerDisplay();
+    timerInterval = setInterval(()=>{
+      if(finished) return;
+      time--;
+      document.getElementById("timer").innerText = "⏱️ Time: "+time;
+      if(time <= 0){finished=true;alert("⏰ TIME UP!");}
+    },1000);
   });
 
-  updateTimerDisplay();
-</script>
-
-</body>
-</html>
-
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Glass Bridge Challenge</title>
-<style>
-body{margin:0;font-family:'Segoe UI',sans-serif;background:#020617;color:white;text-align:center;}
-h1{margin-top:15px;}
-.play-btn{display:inline-block;margin-top:50px;padding:20px 40px;background:#22c55e;color:black;font-size:22px;font-weight:600;border-radius:12px;cursor:pointer;text-decoration:none;transition:0.3s;}
-.play-btn:hover{background:#16a34a;transform:scale(1.05);}
-#game-container{display:none;margin-top:30px;}
-#hud{display:flex;justify-content:center;gap:20px;margin:10px;flex-wrap:wrap;}
-.box{padding:8px 14px;border-radius:8px;background:#020617;border:1px solid #334155;font-size:15px;}
-#timer{color:#facc15;}
-.bridge-container{display:flex;flex-direction:column;align-items:center;margin-top:15px;position:relative;}
-.row{display:flex;gap:25px;margin:7px;}
-.glass{width:90px;height:45px;border-radius:8px;background:rgba(180,220,255,0.6);border:2px solid #7dd3fc;cursor:pointer;transition:0.3s;}
-.glass:hover{background:rgba(125,211,252,0.9);}
-.safe{background:#22c55e !important;}
-.broken{background:#dc2626 !important;transform:rotate(12deg);}
-.disabled{pointer-events:none;opacity:0.6;}
-button{margin-top:12px;padding:6px 14px;border:none;border-radius:6px;cursor:pointer;}
-#player{width:40px;height:70px;background:#16a34a;border-radius:6px;position:absolute;left:calc(50% - 20px);top:0px;transition:0.4s;z-index:10;}
-#player::before{content:"";width:30px;height:30px;background:#fde68a;border-radius:50%;position:absolute;top:-35px;left:5px;}
-@media(max-width:600px){.glass{width:70px;height:38px}#player{width:30px;height:50px;left:calc(50% - 15px);}#player::before{width:25px;height:25px;top:-27px;left:2.5px;}}
-</style>
-</head>
-<body>
-
-<h1>🟦 Glass Bridge Challenge</h1>
-<a class="play-btn" id="startBtn">▶ Play Glass Bridge</a>
-
-<div id="game-container">
-  <div id="hud">
-    <div class="box" id="timer">⏱️ Time: 60</div>
-    <div class="box">🏆 Best: <span id="best">--</span>s</div>
-    <div class="box">📊 Last: <span id="last">--</span>s</div>
-  </div>
-
-  <div class="bridge-container" id="bridgeContainer">
-    <div id="player"></div>
-    <div class="bridge" id="bridge"></div>
-  </div>
-
-  <button onclick="resetBest()">Reset Best</button>
-</div>
-
-<audio id="clickSound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
-<audio id="breakSound" src="https://assets.mixkit.co/active_storage/sfx/2741/2741-preview.mp3"></audio>
-<audio id="winSound" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
-
-<script>
-document.addEventListener("DOMContentLoaded",function(){
-let steps=18,current=0,time=60,finished=false;
-let bridge,bridgeContainer,player,bestEl,lastEl,timerInterval,bestTime=localStorage.getItem("bestTime"),answers=[];
-
-document.getElementById("startBtn").addEventListener("click",function(){
-  document.getElementById("game-container").style.display="block";
-  
-  bridge=document.getElementById("bridge");
-  bridgeContainer=document.getElementById("bridgeContainer");
-  player=document.getElementById("player");
-  bestEl=document.getElementById("best");
-  lastEl=document.getElementById("last");
-  
-  if(bestTime) bestEl.innerText=bestTime;
-  answers=Array.from({length:steps},()=>Math.floor(Math.random()*2));
-  current=0;
-  finished=false;
-  time=60;
-  build();
-  
-  clearInterval(timerInterval);
-  timerInterval=setInterval(()=>{
-    if(finished)return;
-    time--;
-    document.getElementById("timer").innerText="⏱️ Time: "+time;
-    if(time<=0){finished=true;alert("⏰ TIME UP!");}
-  },1000);
-});
-
-function build(){
-  bridge.innerHTML="";
-  for(let i=0;i<steps;i++){
-    const row=document.createElement("div");
-    row.className="row";
-    for(let j=0;j<2;j++){
-      const glass=document.createElement("div");
-      glass.className="glass";
-      if(i===current){glass.onclick=()=>choose(j,glass,row);}
-      else glass.classList.add("disabled");
-      row.appendChild(glass);
+  function build(){
+    bridge.innerHTML = "";
+    for(let i=0; i<steps; i++){
+      const row = document.createElement("div");
+      row.className = "row";
+      for(let j=0; j<2; j++){
+        const glass = document.createElement("div");
+        glass.className = "glass";
+        if(i === current){
+          glass.onclick = ()=>choose(j,glass,row);
+        } else glass.classList.add("disabled");
+        row.appendChild(glass);
+      }
+      bridge.appendChild(row);
     }
-    bridge.appendChild(row);
-  }
-  movePlayerToCurrent();
-}
-
-function movePlayerToCurrent(){
-  const rows=bridge.getElementsByClassName("row");
-  if(current<rows.length){
-    player.style.top=(rows[current].offsetTop-player.offsetHeight-5)+"px";
-  }
-}
-
-function choose(choice,glass,row){
-  row.querySelectorAll(".glass").forEach(g=>g.classList.add("disabled"));
-  document.getElementById("clickSound").play();
-  if(choice===answers[current]){
-    glass.classList.add("safe");
-    current++;
     movePlayerToCurrent();
-    if(current===steps) win();
-    else setTimeout(build,300);
-  }else{
-    glass.classList.add("broken");
-    player.style.transform+=" rotate(90deg)";
-    player.style.opacity="0";
-    gameOver();
   }
-}
 
-function win(){
-  finished=true;
-  document.getElementById("winSound").play();
-  const used=60-time;
-  lastEl.innerText=used;
-  if(!bestTime||used<bestTime){localStorage.setItem("bestTime",used);bestEl.innerText=used;bestTime=used;}
-  setTimeout(()=>alert("🏆 YOU SURVIVED!"),300);
-}
+  function movePlayerToCurrent(){
+    const rows = bridge.getElementsByClassName("row");
+    if(current < rows.length){
+      player.style.top = (rows[current].offsetTop - player.offsetHeight - 5) + "px";
+    }
+  }
 
-function gameOver(){
-  finished=true;
-  document.getElementById("breakSound").play();
-  lastEl.innerText="--";
-  setTimeout(()=>alert("💥 GAME OVER"),300);
-}
+  function choose(choice, glass, row){
+    row.querySelectorAll(".glass").forEach(g=>g.classList.add("disabled"));
+    document.getElementById("clickSound").play();
 
-window.resetBest=function(){
-  localStorage.removeItem("bestTime");
-  bestEl.innerText="--";
-  bestTime=null;
-}
+    if(choice === answers[current]){
+      glass.classList.add("safe");
+      current++;
+      movePlayerToCurrent();
+      if(current === steps) win();
+      else setTimeout(build, 300);
+    } else {
+      glass.classList.add("broken");
+      player.style.transform += " rotate(90deg)";
+      player.style.opacity = "0";
+      gameOver();
+    }
+  }
+
+  function win(){
+    finished = true;
+    document.getElementById("winSound").play();
+    const used = 60 - time;
+    lastEl.innerText = used;
+    if(!bestTime || used < bestTime){
+      localStorage.setItem("bestTime", used);
+      bestEl.innerText = used;
+      bestTime = used;
+    }
+    setTimeout(()=>alert("🏆 YOU SURVIVED!"),300);
+  }
+
+  function gameOver(){
+    finished = true;
+    document.getElementById("breakSound").play();
+    lastEl.innerText = "--";
+    setTimeout(()=>alert("💥 GAME OVER"),300);
+  }
+
+  window.resetBest = function(){
+    localStorage.removeItem("bestTime");
+    bestEl.innerText = "--";
+    bestTime = null;
+  }
 });
 </script>
-</body>
-</html>
+
 
 <a href="https://YOUR-USERNAME.github.io/YOUR-REPO/" target="_blank">Play Glass Bridge</a>
