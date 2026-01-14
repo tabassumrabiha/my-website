@@ -369,9 +369,6 @@
 
 
 
-<a href="#game" class="play-btn">▶ Play Glass Bridge</a>
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -387,6 +384,29 @@ body{
   text-align:center;
 }
 h1{margin-top:15px}
+
+.play-btn{
+  display:inline-block;
+  margin-top:50px;
+  padding:20px 40px;
+  background:#22c55e;
+  color:black;
+  font-size:22px;
+  font-weight:600;
+  border-radius:12px;
+  cursor:pointer;
+  text-decoration:none;
+  transition:0.3s;
+}
+.play-btn:hover{
+  background:#16a34a;
+  transform:scale(1.05);
+}
+
+#game-container{
+  display:none;
+  margin-top:30px;
+}
 
 #hud{
   display:flex;
@@ -450,7 +470,7 @@ button{
   background:#16a34a;
   border-radius:6px;
   position:absolute;
-  left: calc(50% - 20px); /* center above bridge */
+  left: calc(50% - 20px);
   top: 0px;
   transition:0.4s;
   z-index:10;
@@ -479,40 +499,66 @@ button{
 
 <h1>🟦 Glass Bridge Challenge</h1>
 
-<div id="hud">
-  <div class="box" id="timer">⏱️ Time: 60</div>
-  <div class="box">🏆 Best: <span id="best">--</span>s</div>
-  <div class="box">📊 Last: <span id="last">--</span>s</div>
-</div>
+<a class="play-btn" onclick="startGame()">▶ Play Glass Bridge</a>
 
-<!-- Player -->
-<div class="bridge-container" id="bridgeContainer">
-  <div id="player"></div>
-  <div class="bridge" id="bridge"></div>
-</div>
+<div id="game-container">
+  <div id="hud">
+    <div class="box" id="timer">⏱️ Time: 60</div>
+    <div class="box">🏆 Best: <span id="best">--</span>s</div>
+    <div class="box">📊 Last: <span id="last">--</span>s</div>
+  </div>
 
-<button onclick="resetBest()">Reset Best</button>
+  <div class="bridge-container" id="bridgeContainer">
+    <div id="player"></div>
+    <div class="bridge" id="bridge"></div>
+  </div>
+
+  <button onclick="resetBest()">Reset Best</button>
+</div>
 
 <audio id="clickSound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
 <audio id="breakSound" src="https://assets.mixkit.co/active_storage/sfx/2741/2741-preview.mp3"></audio>
 <audio id="winSound" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
 
 <script>
-const steps = 18;
+let steps = 18;
 let current = 0;
 let time = 60;
 let finished = false;
 
-const bridge = document.getElementById("bridge");
-const bridgeContainer = document.getElementById("bridgeContainer");
-const player = document.getElementById("player");
-const bestEl = document.getElementById("best");
-const lastEl = document.getElementById("last");
+let bridge, bridgeContainer, player, bestEl, lastEl, timerInterval;
+let bestTime = localStorage.getItem("bestTime");
 
-const bestTime = localStorage.getItem("bestTime");
-if(bestTime) bestEl.innerText = bestTime;
+function startGame(){
+  document.getElementById("game-container").style.display="block";
+  
+  bridge = document.getElementById("bridge");
+  bridgeContainer = document.getElementById("bridgeContainer");
+  player = document.getElementById("player");
+  bestEl = document.getElementById("best");
+  lastEl = document.getElementById("last");
 
-const answers = Array.from({length:steps},()=>Math.floor(Math.random()*2));
+  if(bestTime) bestEl.innerText = bestTime;
+
+  answers = Array.from({length:steps},()=>Math.floor(Math.random()*2));
+  build();
+  
+  // reset timer
+  time = 60;
+  finished = false;
+  clearInterval(timerInterval);
+  timerInterval=setInterval(()=>{
+    if(finished) return;
+    time--;
+    document.getElementById("timer").innerText="⏱️ Time: "+time;
+    if(time<=0){
+      finished=true;
+      alert("⏰ TIME UP!");
+    }
+  },1000);
+}
+
+let answers = [];
 
 function build(){
   bridge.innerHTML="";
@@ -535,9 +581,6 @@ function build(){
 function movePlayerToCurrent(){
   const rows = bridge.getElementsByClassName("row");
   if(current < rows.length){
-    const rect = rows[current].getBoundingClientRect();
-    const containerRect = bridgeContainer.getBoundingClientRect();
-    // move player exactly above current row
     player.style.top = (rows[current].offsetTop - player.offsetHeight - 5) + "px";
   }
 }
@@ -571,6 +614,7 @@ function win(){
   if(!bestTime || used < bestTime){
     localStorage.setItem("bestTime",used);
     bestEl.innerText = used;
+    bestTime = used;
   }
   setTimeout(()=>alert("🏆 YOU SURVIVED!"),300);
 }
@@ -582,22 +626,11 @@ function gameOver(){
   setTimeout(()=>alert("💥 GAME OVER"),300);
 }
 
-const timerInterval=setInterval(()=>{
-  if(finished) return;
-  time--;
-  document.getElementById("timer").innerText="⏱️ Time: "+time;
-  if(time<=0){
-    finished=true;
-    alert("⏰ TIME UP!");
-  }
-},1000);
-
 function resetBest(){
   localStorage.removeItem("bestTime");
   bestEl.innerText="--";
+  bestTime = null;
 }
-
-build();
 </script>
 
 </body>
