@@ -406,11 +406,12 @@ h1{margin-top:15px}
 
 #timer{color:#facc15}
 
-.bridge{
+.bridge-container{
   display:flex;
   flex-direction:column;
   align-items:center;
   margin-top:15px;
+  position:relative;
 }
 
 .row{
@@ -448,9 +449,11 @@ button{
   height:70px;
   background:#16a34a;
   border-radius:6px;
-  margin-bottom:15px;
-  position:relative;
+  position:absolute;
+  left: calc(50% - 20px); /* center above bridge */
+  top: 0px;
   transition:0.4s;
+  z-index:10;
 }
 
 #player::before{
@@ -466,6 +469,8 @@ button{
 
 @media(max-width:600px){
   .glass{width:70px;height:38px}
+  #player{width:30px;height:50px; left:calc(50% - 15px);}
+  #player::before{width:25px;height:25px; top:-27px; left:2.5px;}
 }
 </style>
 </head>
@@ -480,10 +485,12 @@ button{
   <div class="box">📊 Last: <span id="last">--</span>s</div>
 </div>
 
-<!-- PLAYER -->
-<div id="player"></div>
+<!-- Player -->
+<div class="bridge-container" id="bridgeContainer">
+  <div id="player"></div>
+  <div class="bridge" id="bridge"></div>
+</div>
 
-<div class="bridge" id="bridge"></div>
 <button onclick="resetBest()">Reset Best</button>
 
 <audio id="clickSound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
@@ -497,9 +504,10 @@ let time = 60;
 let finished = false;
 
 const bridge = document.getElementById("bridge");
+const bridgeContainer = document.getElementById("bridgeContainer");
+const player = document.getElementById("player");
 const bestEl = document.getElementById("best");
 const lastEl = document.getElementById("last");
-const player = document.getElementById("player");
 
 const bestTime = localStorage.getItem("bestTime");
 if(bestTime) bestEl.innerText = bestTime;
@@ -508,7 +516,7 @@ const answers = Array.from({length:steps},()=>Math.floor(Math.random()*2));
 
 function build(){
   bridge.innerHTML="";
-  for(let i=0;i<=current;i++){
+  for(let i=0;i<steps;i++){
     const row=document.createElement("div");
     row.className="row";
     for(let j=0;j<2;j++){
@@ -521,17 +529,28 @@ function build(){
     }
     bridge.appendChild(row);
   }
+  movePlayerToCurrent();
+}
+
+function movePlayerToCurrent(){
+  const rows = bridge.getElementsByClassName("row");
+  if(current < rows.length){
+    const rect = rows[current].getBoundingClientRect();
+    const containerRect = bridgeContainer.getBoundingClientRect();
+    // move player exactly above current row
+    player.style.top = (rows[current].offsetTop - player.offsetHeight - 5) + "px";
+  }
 }
 
 function choose(choice,glass,row){
   row.querySelectorAll(".glass").forEach(g=>g.classList.add("disabled"));
   document.getElementById("clickSound").play();
-  
+
   if(choice===answers[current]){
     glass.classList.add("safe");
     current++;
-    player.style.transform = `translateY(${current * 55}px)`; // move player forward
-    
+    movePlayerToCurrent();
+
     if(current===steps){
       win();
     }else setTimeout(build,300);
